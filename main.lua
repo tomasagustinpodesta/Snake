@@ -2,7 +2,7 @@
     Trying my first game, i plan to do snake on love 2d
 
 ]]
-
+require 'Fruit'
 require 'Snake'
 push = require 'push'
 Class = require 'class'
@@ -15,13 +15,16 @@ VIRTUAL_WIDTH = 432
 VIRTUAL_HEIGHT = 243
 
 --Snake speed, I might change it later to change difficulty
-SNAKE_SPEED = 10 
+SNAKE_SPEED = 100
 
 
 -- Here we make: filter, title, sound, fonts, virtual res
 function love.load()
     -- Set default filter
     love.graphics.setDefaultFilter('nearest', 'nearest')
+
+    --For the math.random function
+    math.randomseed(os.time())
 
     -- Title of the game
     love.window.setTitle('Snake')
@@ -45,6 +48,7 @@ function love.load()
     --Snake score
     snake_score = 0 
     snake = Snake()
+    fruit = Fruit()
 
     --Direction of the snake
     direction = 'right'
@@ -81,8 +85,12 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-    
 
+    if fruit:snakeEats(snake, snake_score) then
+        fruit:remove()
+        snake_score = snake_score + 1
+    end
+    fruit:update(dt)
     snake:update(dt)
 end
 
@@ -93,8 +101,12 @@ function love.draw()
         --background
         love.graphics.clear(40/255, 45/255, 52/255, 255/255)
 
-        --draw the snake
         snake:render()
+        --draw the snake
+        if fruit.exists == true then
+            fruit:render()
+        end
+
         
     push:finish()
 end
