@@ -17,21 +17,8 @@ function Fruit:init(x, y)
     self.exists = false
 end
 
-function Fruit:snakeEats(snake)
-    if self.x > snake.x + snake.width or snake.x > self.x + self.width then
-        return false
-    end
-    -- then check to see if the bottom edge of either is higher than the top
-    -- edge of the other
-    if self.y > snake.y + snake.height or snake.y > self.y + self.height then
-        return false
-    end 
-    fruit.exists = false
-    return true
-end
-
-
 function Fruit:update(dt)
+    -- to keep always a fruit in the field
     if self.exists == false then
         fruit.exists = true
     end
