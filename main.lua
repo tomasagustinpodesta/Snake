@@ -1,13 +1,23 @@
 --[[
     Trying my first game, i plan to do snake on love 2d
 ]]
+
+--Class for factorizing code
 require 'Factorization'
+
+--Fruit that the snake eats 
 require 'Fruit'
+
+--Snake 
 require 'Snake'
+
+--In order to render I use this lib
 push = require 'push'
+
+--Lib for making classes
 Class = require 'class'
 
--- place where we are going to play
+--Place where we are going to play
 WINDOW_WIDTH = 1280
 WINDOW_HEIGHT = 720
 
@@ -23,8 +33,8 @@ function love.load()
     -- Set default filter
     love.graphics.setDefaultFilter('nearest', 'nearest')
 
-    --For the math.random function
-    --math.randomseed(os.time())
+    --For the math.random function, its seems to work without it
+    math.randomseed(os.time())
 
     -- Title of the game
     love.window.setTitle('Snake')
@@ -48,28 +58,32 @@ function love.load()
     --Snake score
     snake_score = 0 
 
-    --snake object
+    --Snake object
     snake = Snake()
 
-    --fruit object
+    --Fruit object
     fruit = Fruit()
 
-    --factorization object
+    --Factorization object for saving code whenever I can
     fact = Factorization()
 
     --Direction of the snake
     direction = 'right'
 
+    --Tail table for the snake, I might make an object to make it better
     tail = {}
 
+    --I use this to avoid making the snake collides with its neck
     time_delay = 15
 
+    --Flag to make you lose
     flag = false
 end
 
-function love.resize(w, h)
+--[[function love.resize(w, h)
     push:resize(w, h)
-end
+end]]
+
 
 function love.keypressed(key)
 
@@ -78,6 +92,7 @@ function love.keypressed(key)
         love.event.quit()
     end
 
+    --Set all the movements
     -- right movement
     if love.keyboard.isDown('d') then
         if fact:checkDirection('right', snake.direction) then
@@ -106,36 +121,43 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-    oldPosX = snake.x
-    oldPosY = snake.y
-    if snake:eats(fruit) then
-        for i = 1, time_delay, 1 do
-            table.insert(tail, {0, 0})
+    if not(flag) then
+        --Saving the last place of the snake to make the tail
+        oldPosX = snake.x
+        oldPosY = snake.y
+
+        --If the snake eats a fruit
+        if snake:eats(fruit) then
+            for i = 1, time_delay, 1 do
+                table.insert(tail, {0, 0})
+            end
+            fruit:init()
+            snake_score = snake_score + 1
         end
-        fruit:init()
-        snake_score = snake_score + 1
-    end
-    time = dt
     
-    fruit:update(dt)
-    snake:update(dt)
+        --Updates for the objects
+        fruit:update(dt)
+        snake:update(dt)
 
-    for k, v in ipairs(tail) do
-        local x, y = v[1], v[2]
-        v[1], v[2] = oldPosX, oldPosY
-        oldPosX, oldPosY = x, y 
-    end
+        --Assing to every part of the tail the coordinates of their prevous link in the chain to make follow it
+        for k, v in ipairs(tail) do
+            local x, y = v[1], v[2]
+            v[1], v[2] = oldPosX, oldPosY
+            oldPosX, oldPosY = x, y 
+        end
 
-    for k, v in ipairs(tail) do
-        if k > 30 then
-            if fact:collides(v[1],v[2], snake.x, snake.y) then
-                flag = true
-                errorPlace = k
+        --Check if the snake collides with itself
+        --Note: I avoid the first two links of the snake in order to avoid the snake collides with its neck
+        for k, v in ipairs(tail) do
+            if k > 30 then
+                if fact:collides(v[1],v[2], snake.x, snake.y) then
+                    flag = true
+                    errorPlace = k
+                end
             end
         end
     end
 end
-
 
 
 function displayScore()
@@ -146,26 +168,29 @@ end
 
 --All the visuals
 function love.draw()
+    --Using the push lib
     push:start()
 
-        --background
+        --Background
         love.graphics.clear(40/255, 45/255, 52/255, 255/255)
-
-        --draw the snake
-        snake:render()
         
-        for k, v in ipairs(tail) do
-            love.graphics.rectangle('fill', v[1], v[2], 10, 10)
-        end
-        --spawn fruits
+        --Draw fruits
         if fruit.exists == true then
             fruit:render()
         end
+
         --score
         displayScore()
 
+        --Lose indicator in case the snake collides
         if flag == true then 
-            love.graphics.print('you lose', VIRTUAL_WIDTH / 3, VIRTUAL_HEIGHT / 6)
+            love.graphics.print('You Lose', VIRTUAL_WIDTH / 3, VIRTUAL_HEIGHT / 3)
+        else
+            snake:render()
+
+            for k, v in ipairs(tail) do
+                love.graphics.rectangle('fill', v[1], v[2], 10, 10)
+            end
         end
 
     push:finish()

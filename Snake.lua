@@ -108,11 +108,3 @@ end
 function Snake:add()
     table.insert(snake_body, {0, 0})
 end
-
-function Snake:getoldX()
-    return oldPosX
-end
-
-function Snake:getoldY()
-    return oldPosY
-end
