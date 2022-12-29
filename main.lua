@@ -1,5 +1,5 @@
 --[[
-    Trying my first game, i plan to do snake on love 2d
+    Trying my first game, I plan to do snake on Love 2d
 ]]
 
 --Class for factorizing code
@@ -185,9 +185,14 @@ function love.draw()
         --Lose indicator in case the snake collides
         if flag == true then 
             love.graphics.print('You Lose', VIRTUAL_WIDTH / 3, VIRTUAL_HEIGHT / 3)
+
         else
+            --In case when dont crash
+
+            --Draw the snake
             snake:render()
 
+            --Draw the body of the snake
             for k, v in ipairs(tail) do
                 love.graphics.rectangle('fill', v[1], v[2], 10, 10)
             end

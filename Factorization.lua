@@ -1,3 +1,7 @@
+--[[
+   Factorization class, used mostly for saving lines of code
+]]
+
 
 Class = require 'class'
 Factorization = Class{}
